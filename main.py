@@ -2,7 +2,7 @@
 from typing import Final
 from discord import Intents, Client, Message, DMChannel
 from dotenv import load_dotenv
-from responses import get_response
+from src.responses import get_response
 import os
 
 load_dotenv()
