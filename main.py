@@ -3,14 +3,14 @@ from typing import Final
 from discord import Intents, Client, Message, DMChannel
 from dotenv import load_dotenv
 from src.responses import get_response
-import os
+import os, asyncio, random
 
 load_dotenv()
 TOKEN: Final[str] = os.getenv('DISCORD_TOKEN')
 MODEL: Final[str] = os.getenv('MODEL_NAME')
 
 intents: Intents = Intents.default()
-intents.message_content = True #NOQA
+intents.message_content = True
 client: Client = Client(intents=intents)
 
 async def send_message(message: Message, user_message: str) -> None:
@@ -20,9 +20,17 @@ async def send_message(message: Message, user_message: str) -> None:
     if is_private := user_message[0] == '?':
         user_message = user_message[1:]
     try:
-        response: str = get_response(MODEL, user_message)
-        
-        await message.author.send(str(response)) if is_private else await message.channel.send(str(response))
+        response: str = get_response(MODEL, user_message, )
+        sentence = ""
+
+        for chunk in response:
+            sentence += chunk["message"]["content"]
+            random_float = random.choice([0.2, 0.3])
+            await asyncio.sleep(random_float)
+            if chunk["message"]["content"] in [".", "!", "?", "\n"]:
+                await message.author.send(str(sentence)) if is_private else await message.channel.send(str(sentence))
+                print(sentence)
+                sentence = ""
     except Exception as e:
         print(e)
         
