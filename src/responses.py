@@ -24,7 +24,6 @@ def get_response(model: str, user_input: str) -> str:
     )
     return response
 
-
 # DEBUG SECTION
 def test_get_response():
     """
