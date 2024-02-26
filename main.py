@@ -21,6 +21,7 @@ async def send_message(message: Message, user_message: str) -> None:
         user_message = user_message[1:]
     try:
         response: str = get_response(MODEL, user_message)
+        
         await message.author.send(str(response)) if is_private else await message.channel.send(str(response))
     except Exception as e:
         print(e)
