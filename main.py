@@ -22,15 +22,20 @@ async def send_message(message: Message, user_message: str) -> None:
     try:
         response: str = get_response(MODEL, user_message, )
         sentence = ""
-
+        token_counter = 0
+        
         for chunk in response:
             sentence += chunk["message"]["content"]
-            random_float = random.choice([0.2, 0.3])
+            token_counter += 1
+            random_float = random.choice([0.15, 0.25])
             await asyncio.sleep(random_float)
-            if chunk["message"]["content"] in [".", "!", "?", "\n"]:
-                await message.author.send(str(sentence)) if is_private else await message.channel.send(str(sentence))
-                print(sentence)
-                sentence = ""
+            
+            if token_counter > 10:
+                if chunk["message"]["content"] in [".", "!", "?", "\n"]:
+                    await message.author.send(str(sentence)) if is_private else await message.channel.send(str(sentence))
+                    print(sentence)
+                    sentence = ""
+                    token_counter = 0
     except Exception as e:
         print(e)
         
