@@ -20,7 +20,7 @@ async def send_message(message: Message, user_message: str) -> None:
     if is_private := user_message[0] == '?':
         user_message = user_message[1:]
     try:
-        response: str = get_response(MODEL, user_message, )
+        response: str = get_response(MODEL, user_message)
         sentence = ""
         token_counter = 0
         
@@ -30,12 +30,11 @@ async def send_message(message: Message, user_message: str) -> None:
             random_float = random.choice([0.15, 0.25])
             await asyncio.sleep(random_float)
             
-            if token_counter > 10:
-                if chunk["message"]["content"] in [".", "!", "?", "\n"]:
-                    await message.author.send(str(sentence)) if is_private else await message.channel.send(str(sentence))
-                    print(sentence)
-                    sentence = ""
-                    token_counter = 0
+            if token_counter > 10 and chunk["message"]["content"] in [".", "!", "?", "\n"]:
+                await message.author.send(str(sentence)) if is_private else await message.channel.send(str(sentence))
+                print(sentence)
+                sentence = ""
+                token_counter = 0
     except Exception as e:
         print(e)
         
@@ -66,7 +65,7 @@ async def on_message(message: Message) -> None:
     await message.remove_reaction('🤔', member=client.user)
 
 def main() -> None:
-    client.run(token=TOKEN)
+    client.run(TOKEN)
     
 if __name__ == '__main__':
     main()
