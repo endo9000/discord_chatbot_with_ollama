@@ -15,33 +15,35 @@ client: Client = Client(intents=intents)
 
 async def send_message(message: Message, user_message: str) -> None:
     if not user_message:
-        print("(Message was empty because intents were not enabled probably)")
+        print('(Message was empty because intents were not enabled probably)')
         return
     if is_private := user_message[0] == '?':
         user_message = user_message[1:]
     try:
         response: str = get_response(MODEL, user_message)
-        sentence = ""
+        sentence = ''
         token_counter = 0
         
         for chunk in response:
-            sentence += chunk["message"]["content"]
+            sentence += chunk['message']['content']
             token_counter += 1
+            # delete all \n's from the sentence
+            sentence = sentence.replace('\n ', '')
             random_float = random.choice([0.15, 0.25])
             await asyncio.sleep(random_float)
             
-            if token_counter > 10 and chunk["message"]["content"] in [".", "!", "?", "\n"]:
+            if token_counter > 10 and chunk['message']['content'] in ['.', '!', '?']:
                 await message.author.send(str(sentence)) if is_private else await message.channel.send(str(sentence))
                 print(sentence)
-                sentence = ""
+                sentence = ''
                 token_counter = 0
     except Exception as e:
         print(e)
-        
+
+
 @client.event
 async def on_ready() -> None:
     print(f'{client.user} is now running!')
-    
 @client.event
 async def on_message(message: Message) -> None:
     if message.author == client.user:
